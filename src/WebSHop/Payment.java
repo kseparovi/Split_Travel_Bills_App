@@ -1,5 +1,8 @@
 package WebSHop;
 
+import java.util.InputMismatchException;
+import java.util.Scanner;
+
 public class Payment {
     private long paymentID;
 
@@ -8,11 +11,40 @@ public class Payment {
     }
 
     public void possiblePaymentMethods() {
-        System.out.println("You can pay by:\nCOD Cash On Delivery\nCC Credit Card\nPP PayPal service");
+        System.out.println("Possible payment methods: cash on delivery, credit card, PayPal...");
+        System.out.println("Please choose payment method..."
+                + "\n1. Cash on delivery"
+                + "\n2. Credit card"
+                + "\n3. PayPal"
+                + "\n4. Cancel");
     }
 
     public void payPackage() {
-        System.out.println("Payment method - cash on delivery...");
+        Scanner scanner = new Scanner(System.in);
+        int choice;
+        try {
+            choice = scanner.nextInt();
+            switch (choice) {
+                case 1:
+                    System.out.println("Payment method: Cash on delivery");
+                    break;
+                case 2:
+                    System.out.println("Payment method: Credit card");
+                    break;
+                case 3:
+                    System.out.println("Payment method: PayPal");
+                    break;
+                case 4:
+                    System.out.println("Payment canceled.");
+                    break;
+                default:
+                    System.out.println("Invalid choice. Payment canceled.");
+                    break;
+            }
+        } catch (InputMismatchException e) {
+            System.out.println("Invalid input. Payment canceled.");
+        }
+
     }
 
     @Override

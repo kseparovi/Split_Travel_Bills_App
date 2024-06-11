@@ -53,4 +53,8 @@ public class Package {
     public ArrayList<Integer> getItemsQuantities() {
         return itemsQuantities;
     }
+
+    public long getPackageID() {
+        return packageID;
+    }
 }

@@ -1,11 +1,5 @@
 package WebSHop;
 
-
-
-import java.util.ArrayList;
-
-
-
 import java.util.ArrayList;
 import java.util.Scanner;
 
@@ -14,7 +8,7 @@ public class WebShop {
     private ArrayList<Item> items;
     private ArrayList<Customer> customers;
     private ArrayList<Package> packages;
-    private ArrayList<Payment> payments; //why is here error? I have imported Payment class from the same package
+    private ArrayList<Payment> payments;
 
     public WebShop(String name) {
         this.name = name;
@@ -42,10 +36,9 @@ public class WebShop {
         }
 
         System.out.println(pack.toString());
-        finishAndPay(pack);
     }
 
-    public void finishAndPay(Package pack) {
+    public void finishAndPay(Customer customer) {
         Payment payment = new Payment();
         payments.add(payment);
         payment.possiblePaymentMethods();
@@ -54,14 +47,14 @@ public class WebShop {
         String paymentMethod = scanner.nextLine();
         payment.payPackage();
 
-        System.out.println("Package{packageID=" + pack.getPackageItems() + ", customer=" + pack.getCustomer() + ", totalPrice=" + pack.getTotalPrice() + "}");
+        Package pack = packages.get(packages.size() - 1);
+
+        System.out.println("Package{packageID=" + pack.getPackageID() + ", customer=" + pack.getCustomer() + ", totalPrice=" + pack.getTotalPrice() + "}");
         System.out.println("Package will be delivered to: " + pack.getCustomer().getAddress());
         System.out.println("------------------------------------------------------------------------------");
-        System.out.println("Package with id: " + pack.getPackageItems());
+        System.out.println("Package with id: " + pack.getPackageID());
         System.out.println("Send to customer: " + pack.getCustomer());
         System.out.println("------------------------------------------------------------------------------");
-
-        packages.add(pack);
 
         // Update inventory quantities
         for (int i = 0; i < pack.getPackageItems().size(); i++) {

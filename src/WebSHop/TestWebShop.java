@@ -12,6 +12,7 @@ public class TestWebShop {
 
         Customer customer = new Customer (1, "John", "New York");
         ws.putItemsInPackage(customer);
+        ws.finishAndPay(customer);
 
 
     }
