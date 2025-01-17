@@ -14,6 +14,7 @@ public class RightPanel extends JPanel implements ExpencesObserver, RightPanelLi
     private DefaultTableModel tableModel;
     private JTextArea totalDebtsArea;
     private Map<String, Double> totalDebts;
+    private Controller controller;
 
     public RightPanel() {
         setLayout(new BorderLayout());
@@ -67,7 +68,7 @@ public class RightPanel extends JPanel implements ExpencesObserver, RightPanelLi
         }
     }
 
-    private void updateTotalDebtsDisplay() {
+    public void updateTotalDebtsDisplay() {
         StringBuilder debtsDisplay = new StringBuilder("Total Debts:\n");
         for (Map.Entry<String, Double> entry : totalDebts.entrySet()) {
             debtsDisplay.append(entry.getKey())
@@ -85,12 +86,14 @@ public class RightPanel extends JPanel implements ExpencesObserver, RightPanelLi
 
     @Override
     public void rightPanelEventOccurred(RightPanelEvent event) {
-        // Handle the event
+        // Handle the event (if needed)
     }
 
     public void setController(Controller controller) {
-        // Set the controller
+        this.controller = controller;
+    }
 
-
+    public void refreshTable() {
+        tableModel.fireTableDataChanged();
     }
 }

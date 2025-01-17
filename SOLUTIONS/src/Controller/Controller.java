@@ -8,6 +8,8 @@ import java.io.*;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
+import java.util.Arrays;
+import java.util.Collections;
 import java.util.Date;
 import java.util.List;
 
@@ -40,7 +42,7 @@ public class Controller {
         rightPanel.addExpense(name, category, paidBy, date, amount, users);
 
         // Save to database
-        saveExpenseToDatabase(expense, paidBy);
+        saveExpenseToDatabase(expense, paidBy );
     }
 
     private Expense createExpense(String name, String category, double amount, Date date) {
@@ -55,6 +57,16 @@ public class Controller {
                 return new DrinkExpenses(name, amount, date, "Beer");
             default:
                 return new Expense(name, amount, date) {
+                    @Override
+                    public String getPaidBy() {
+                        return "";
+                    }
+
+                    @Override
+                    public List<String> getUsers() {
+                        return List.of();
+                    }
+
                     @Override
                     public String toString() {
                         return String.format("Other: %s", getName());
@@ -82,25 +94,7 @@ public class Controller {
         exitApplication();
     }
 
-    public void handleExport() {
-        File dataDir = new File("DATA");
-        if (!dataDir.exists()) {
-            dataDir.mkdir();
-        }
 
-        File file = new File(dataDir, "expenses_export.txt");
-
-        try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
-            for (Expense expense : expencesModel.getExpenses()) {
-                writer.write(expenseToString(expense));
-                writer.newLine();
-            }
-            JOptionPane.showMessageDialog(null, "Data exported successfully.", "Export", JOptionPane.INFORMATION_MESSAGE);
-        } catch (IOException e) {
-            e.printStackTrace(); // Handle error
-            JOptionPane.showMessageDialog(null, "Error exporting data: " + e.getMessage(), "Export Error", JOptionPane.ERROR_MESSAGE);
-        }
-    }
 
     private String expenseToString(Expense expense) {
         return String.format("%s,%s,%s,%s,%.2f",
@@ -110,35 +104,35 @@ public class Controller {
                 new java.sql.Date(expense.getDate().getTime()),
                 expense.getAmount());
     }
-    public void handleImport() {
+    public void handleExport() {
         JFileChooser fileChooser = new JFileChooser();
-        int result = fileChooser.showOpenDialog(null);
+        int result = fileChooser.showSaveDialog(null);
         if (result == JFileChooser.APPROVE_OPTION) {
             File file = fileChooser.getSelectedFile();
-            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
-                String line;
-                while ((line = reader.readLine()) != null) {
-                    String[] data = line.split(",");
-                    if (data.length == 5) {
-                        String name = data[0];
-                        String category = data[1];
-                        String paidBy = data[2];
-                        Date date = java.sql.Date.valueOf(data[3]);
-                        double amount = Double.parseDouble(data[4].replace(",", "."));
-
-                        Expense expense = createExpense(name, category, amount, date);
-                        expencesModel.addExpense(expense);
-                        rightPanel.addExpense(name, category, paidBy, date, amount, List.of(paidBy)); // Adjust user list as needed
-                        saveExpenseToDatabase(expense, paidBy); // Save to database as well
-                    }
+            try (BufferedWriter writer = new BufferedWriter(new FileWriter(file))) {
+                for (Expense expense : expencesModel.getExpenses()) {
+                    String line = String.format("%s,%s,%s,%s,%.2f,%s",
+                            expense.getName(),
+                            expense.getCategory(),
+                            expense.getPaidBy() != null ? expense.getPaidBy() : "null", // Fixing 'null'
+                            expense.getDate().toString(),
+                            expense.getAmount(),
+                            String.join(";", expense.getUsers()) // Ensure this is populated
+                    );
+                    writer.write(line);
+                    writer.newLine();
                 }
-                JOptionPane.showMessageDialog(null, "Data imported successfully.", "Import", JOptionPane.INFORMATION_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Data exported successfully.", "Export", JOptionPane.INFORMATION_MESSAGE);
             } catch (IOException e) {
-                e.printStackTrace(); // Handle error
-                JOptionPane.showMessageDialog(null, "Error importing data: " + e.getMessage(), "Import Error", JOptionPane.ERROR_MESSAGE);
+                JOptionPane.showMessageDialog(null, "Error exporting data: " + e.getMessage(), "Export Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
             }
         }
     }
+
+
+
+
 
     public void exitApplication() {
         System.exit(0);
@@ -171,4 +165,48 @@ public class Controller {
             }
         }
     }
+
+
+    public void handleImport() {
+        JFileChooser fileChooser = new JFileChooser();
+        int result = fileChooser.showOpenDialog(null);
+        if (result == JFileChooser.APPROVE_OPTION) {
+            File file = fileChooser.getSelectedFile();
+            try (BufferedReader reader = new BufferedReader(new FileReader(file))) {
+                String line;
+                while ((line = reader.readLine()) != null) {
+                    String[] data = line.split(",", -1); // Keep empty fields
+
+                    if (data.length == 5 || data.length == 6) { // Accept 5 or 6 fields
+                        String name = data[0];
+                        String category = data[1];
+                        String paidBy = data[2].equals("null") ? null : data[2]; // Handle "null" as a real null value
+                        Date date = java.sql.Date.valueOf(data[3]);
+
+                        // Fix the number parsing by replacing commas with dots
+                        double amount = Double.parseDouble(data[4].replace(",", "."));
+
+                        List<String> users = (data.length == 6 && !data[5].isEmpty())
+                                ? Arrays.asList(data[5].split(";"))
+                                : Collections.emptyList();
+
+                        Expense expense = createExpense(name, category, amount, date);
+                        expencesModel.addExpense(expense); // Add to model
+                        rightPanel.addExpense(name, category, paidBy, date, amount, users);
+                        saveExpenseToDatabase(expense, paidBy);
+                    } else {
+                        System.out.println("Skipping invalid line: " + line);
+                    }
+                }
+
+                // Refresh table after import
+                rightPanel.refreshTable();
+                JOptionPane.showMessageDialog(null, "Data imported successfully.", "Import", JOptionPane.INFORMATION_MESSAGE);
+            } catch (IOException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(null, "Error importing data: " + e.getMessage(), "Import Error", JOptionPane.ERROR_MESSAGE);
+                e.printStackTrace();
+            }
+        }
+    }
+
 }

@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.Date;
+import java.util.List;
 
 public class TicketExpenses extends Expense {
     private String transportType;
@@ -13,6 +14,16 @@ public class TicketExpenses extends Expense {
     @Override
     public String getCategory() {
         return "Karte";
+    }
+
+    @Override
+    public String getPaidBy() {
+        return "";
+    }
+
+    @Override
+    public List<String> getUsers() {
+        return List.of();
     }
 
     @Override

@@ -1,2 +1,2 @@
-gaga,Karte,null,2025-01-15,10101,00
-gaga,Karte,null,2025-01-15,1101,00
+dinner,Other,null,2025-01-17,500,00
+dinner,Other,null,2025-01-17,250,00

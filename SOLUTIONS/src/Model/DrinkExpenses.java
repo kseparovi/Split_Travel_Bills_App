@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.Date;
+import java.util.List;
 
 public class DrinkExpenses extends Expense {
     private String type;
@@ -12,6 +13,16 @@ public class DrinkExpenses extends Expense {
 
     public String getType() {
         return type;
+    }
+
+    @Override
+    public String getPaidBy() {
+        return "";
+    }
+
+    @Override
+    public List<String> getUsers() {
+        return List.of();
     }
 
     @Override

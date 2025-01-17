@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.Date;
+import java.util.List;
 
 public class AccommodationExpenses extends Expense {
     private String location;
@@ -18,6 +19,16 @@ public class AccommodationExpenses extends Expense {
 
     public int getNights() {
         return nights;
+    }
+
+    @Override
+    public String getPaidBy() {
+        return "";
+    }
+
+    @Override
+    public List<String> getUsers() {
+        return List.of();
     }
 
     @Override

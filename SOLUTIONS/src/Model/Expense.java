@@ -1,6 +1,7 @@
 package Model;
 
 import java.util.Date;
+import java.util.List;
 
 public abstract class Expense {
     private String name;
@@ -26,12 +27,12 @@ public abstract class Expense {
     }
 
     public String getCategory() {
-        return "Other";
+        return "Other"; // Default category, subclasses can override
     }
 
-    public String getPaidBy() {
-        return null;
-    }
+    public abstract String getPaidBy(); // Force subclasses to implement
+
+    public abstract List<String> getUsers(); // Force subclasses to implement
 
     @Override
     public abstract String toString();
